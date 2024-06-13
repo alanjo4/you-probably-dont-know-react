@@ -1,3 +1,5 @@
+const { performance } = require('perf_hooks');
+
 function isBrowserBusy(callback) {
     const startTime = performance.now();
 	// React usa la API de MessageChannel en realidad...

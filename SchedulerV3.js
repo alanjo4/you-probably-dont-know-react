@@ -1,3 +1,6 @@
+const { performance } = require('perf_hooks');
+const { MessageChannel } = require('worker_threads');
+
 function Scheduler() {
 	this.taskQueue = [];
 	this.timerQueue = [];
