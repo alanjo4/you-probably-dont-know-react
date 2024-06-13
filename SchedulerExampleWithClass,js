@@ -1,0 +1,46 @@
+class Scheduler {
+    constructor() {
+        this.taskQueue = [];
+        this.isRunning = false;
+        this.threshold = 5;
+        this.channel = new MessageChannel();
+        this.channel.port1.onmessage = this.runTasks.bind(this);
+    }
+
+    scheduleTask(callback) {
+        this.taskQueue.push(callback);
+        if (!this.isRunning) {
+            this.isRunning = true;
+            this.channel.port2.postMessage(null);
+        }
+    }
+
+    runTasks() {
+        const startTime = performance.now();
+        while (this.taskQueue.length > 0) {
+            const currentTime = performance.now();
+            if (currentTime - startTime > this.threshold) {
+                console.log("El navegador está ocupado.");
+                break;
+            }
+
+            const task = this.taskQueue.shift();
+            task();
+        }
+        this.isRunning = false;
+        if (this.taskQueue.length > 0) {
+            this.channel.port2.postMessage(null);
+        }
+    }
+}
+
+const scheduler = new Scheduler();
+
+function myTask() {
+    console.log("Ejecutando tarea...");
+}
+
+// 10 tareas...
+for (let i = 0; i < 10; i++) {
+    scheduler.scheduleTask(myTask);
+}
